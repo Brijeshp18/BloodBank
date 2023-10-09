@@ -6,7 +6,7 @@ import { RegisterUser } from "../../Apicall/users";
 
 
 function Register() {
-  const [type, settype] = useState("donar");
+  const [type, settype] = useState("donor");
   const [form] = Form.useForm();
   form.setFieldsValue({});
   const onFinish = async(values) => {
@@ -59,11 +59,11 @@ function Register() {
           onChange={(e) => settype(e.target.value)}
           value={type}
         >
-          <Radio value="donar">Donar</Radio>
+          <Radio value="donor">donor</Radio>
           <Radio value="hospital">Hospital</Radio>
           <Radio value="organization">Organization</Radio>
         </Radio.Group>
-        {type === "donar" && (
+        {type === "donor" && (
           <>
             <Form.Item
               label="Name"
@@ -96,8 +96,8 @@ function Register() {
                { required: true, message: "please enter your Blood group" },
              {min:1},
              {max:3},
-             {pattern:/^(A|B|AB|O)[\+\-]?$/,message:'invalid blood group'
-             },
+             {pattern:/^(A|B|AB|O)[\+\-]?$/,message:'invalid blood group'  },
+           
                
              ]}
              hasFeedback
@@ -123,7 +123,7 @@ function Register() {
             </Form.Item>
           </>
         )}
-        {type !== "donar" && (
+        {type !== "donor" && (
           <>
             <Hospital type={type} />
           </>

@@ -9,11 +9,8 @@ export const RegisterUser =async (payload)=>{
     return response
 }
 
-// export const GetCurrentUser =async (payload)=>{
-//     const response= await axiosInstances("get","/api/users/get-current-user",payload);
-//     return response
-// }
+
 export const GetCurrentUser = async () => {
-    const response = await axiosInstances("get", "/api/users/get-current-user");
+    const response = await axiosInstances("get","/api/users/get-current-user");
     return response;
   };

@@ -3,130 +3,185 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/userModels");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
+const apiController=require("../controllers/apiControl")
+const twilio = require("twilio");
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+const client = twilio(accountSid, authToken);
 
 
 //register a new user
+/**
+ * @swagger
+ * /api/users/register:
+ *   post:
+ *     summary: Register a new user.
+ *     tags: [users]
+ *     description: Register a new user based on their user type (donor, hospital, or organization).
+ *     tag : ["Users"] 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userType:
+ *                 type: string
+ *                 enum: [donor, hospital, organization]
+ *                 description: The type of user (donor, hospital, or organization).
+ *               aadharcardnumber:
+ *                 type: string
+ *                 description: The Aadhar card number (required for donors).
+ *               email:
+ *                 type: string
+ *                 description: The email address (required for hospitals and organizations).
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *               phone:
+ *                  type: string
+ *                
+ *     responses:
+ *       200:
+ *         description: User registered successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the registration was successful.
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating the registration status.
+ *       400:
+ *         description: Bad Request. Invalid user type or existing user with the same Aadhar card number or email.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the registration failed.
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating the registration status.
+ *       500:
+ *         description: Internal Server Error. Registration failed due to a server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the registration failed.
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating the registration status.
+ *                
+ */
 
-router.post("/register", async (req, res) => {
-  try {
-    console.log("Received registration request:", req.body);
+router.post("/register",apiController.register )
+//login functions
 
-    // Check if a user with the same Aadhar card number already exists
-    const userTypes = req.body.userType;
-    console.log("register User type:", userTypes);
-    if (userTypes === "donar") {
-      const existingUser = await User.findOne({
-        aadharcardnumber: req.body.aadharcardnumber,
-      });
+/**
+ * @swagger
+ * /api/users/login:
+ *   post:
+ *     summary: User login.
+ *     tags: [users]
+ *     description: Authenticate and login a user based on their user type (donor, hospital, or organization).
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userType:
+ *                 type: string
+ *                 enum: [donor, hospital, organization]
+ *                 description: The type of user (donor, hospital, or organization).
+ *               aadharcardnumber:
+ *                 type: string
+ *                 description: The Aadhar card number (required for donors).
+ *               email:
+ *                 type: string
+ *                 description: The email address (required for hospitals and organizations).
+ *               password:
+ *                 type: string
+ *                 description: The user's password.
+ *               organizationName:
+ *                 type: string
+ *                 description: The organization name.
+ *               hospitalName:
+ *                 type: string
+ *                 description: The hospital name.
+ *     responses:
+ *       200:
+ *         description: User logged in successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the login was successful.
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating the login status.
+ *                 data:
+ *                   type: string
+ *                   description: JWT token for authentication.
+ *       400:
+ *         description: Bad Request. Invalid user type or user not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the login failed.
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating the login status.
+ *       401:
+ *         description: Unauthorized. Invalid password or user type mismatch.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the login failed.
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating the login status.
+ *       500:
+ *         description: Internal Server Error. Login failed due to a server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the login failed.
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating the login status.
+ */
 
-      if (existingUser) {
-        return res.send({
-          success: false,
-          message: "User already exists with the provided Aadhar card number.",
-        });
-      }
-      const newUser = new User(req.body);
-      await newUser.save();
-      return res.send({
-        success: true,
-        message: "User registered successfully",
-      });
-    } else {
-      // Hash the password
 
-      if (userTypes === "hospital" || userTypes === "organization") {
-        const existingUser = await User.findOne({ email: req.body.email });
-        if (existingUser) {
-          return res.send({
-            success: false,
-            message: "User already exists with the provided Email.",
-          });
-        } else {
-          const salt = await bcrypt.genSalt(10);
-          const hashedPassword = await bcrypt.hash(req.body.password, salt);
-          req.body.password = hashedPassword;
-
-          // Create a new user document and save it to the database
-          const newUser = new User(req.body);
-          await newUser.save();
-          return res.send({
-            success: true,
-            message: "User registered successfully",
-          });
-        }
-      }
-    }
-  } catch (error) {
-    console.error("Registration error:", error);
-    return res.status(500).send({
-      success: false,
-      message: "Registration failed",
-    });
-  }
-});
-
-router.post("/login", async (req, res) => {
-  try {
-    console.log("Received login request:", req.body);
-    //check if user exists
-    const userTypes = req.body.userType;
-    console.log("User type login:",userTypes);
-    if (userTypes === "donar"){
-      const users = await User.findOne({ aadharcardnumber : req.body.aadharcardnumber });
-      if (!users) {
-        return res.send({
-          message: "user does not exists",
-          success: false,
-        });
-      }
-      
-    }
-    if (userTypes === "hospital" || userTypes === "organization") {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      return res.send({
-        message: "user does not exists",
-        success: false,
-      });
-    }
-        // check if userType matches
-        if (user.userTypes !== req.body.userTypes) {
-          return res.send({
-            success: false,
-            message: `User is not registered as ${req.body.userType}`,
-          });
-        }
-    
-    //compare password
-    const isPasswordValid = await bcrypt.compare(
-      req.body.password,
-      user.password
-    );
-    if (!isPasswordValid) {
-      return res.send({
-        success: false,
-        message: "Invalid password.",
-      });
-    }
-
-    // Create a JWT token for authentication 1st parameter will be data we want to encrypt 2nd will be  secret key to decrypt the data 3rd will be timeout(how much time will be the validity is)
-    
-    const payload ={ userId: user._id }; 
-    const secretKey ='Blood-bank' //process.env.jwt_secret
-    const token = jwt.sign(payload, secretKey, { expiresIn: '1d' });
-    console.log("token is here ", token);
-    return res.send({
-      success: true,
-      message: "user logged in sucessfully",
-      data: token,
-    });
-  }} catch (error) {
-    return res.send({
-      success: false,
-      message: error.message,
-    });
-  }
-}
+router.post("/login",apiController.login 
 );
 
   // generate token
@@ -172,6 +227,75 @@ router.post("/login", async (req, res) => {
 // })
 
 // get current user
+
+/**
+ * @swagger
+ * /api/users/get-current-user:
+ *   get:
+ *     summary: Get the current user.
+ *     tags: [users]
+ *     description: Retrieve the details of the currently authenticated user.
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User fetched successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the user data retrieval was successful.
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating the status of the operation.
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized. User authentication failed.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates that the user is not authenticated.
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating the status of the operation.
+ *       500:
+ *         description: Internal Server Error. User data retrieval failed due to a server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates that the operation failed.
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating the status of the operation.
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The unique identifier for the user.
+ *         username:
+ *           type: string
+ *           description: The username of the user.
+ *         email:
+ *           type: string
+ *           description: The email address of the user.
+ */
+
+
 router.get("/get-current-user", authMiddleware, async (req, res) => {
   try {
     const user = await User.findOne({  

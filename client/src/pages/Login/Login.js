@@ -1,26 +1,36 @@
 import React, { useState } from "react";
 import { Button, Form, Input, Radio,message } from "antd";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { LoginUser } from "../../Apicall/users";
 import OTPForm from './Otpform'
+import { useDispatch } from "react-redux";
+import { SetLoading } from "../../Redux/loadersSlice";
+
+
 
 
 
 function Login() {
-  const [type, settype] = useState("donar");
+  const [type, settype] = useState("donor");
   const [form] = Form.useForm(); 
   const Navigate= useNavigate();
+  const dispatch = useDispatch();
+  
 
   const onFinish = async (values) => {
     console.log("form datas", values);
     try {
+    
+      dispatch(SetLoading(true));
       const response= await LoginUser({...values, userType:type})
+      dispatch(SetLoading(false));
       if(response.success){
       message.success(response.message)
       localStorage.setItem("token",response.data)
       Navigate("/")
       }
       else {
+        dispatch(SetLoading(false));
           throw new Error(response.message)
       }  
   } catch (error) {
@@ -54,11 +64,11 @@ function Login() {
           onChange={(e) => settype(e.target.value)}
           value={type}
         >
-          <Radio value="donar">Donar</Radio>
+          <Radio value="donor">donor</Radio>
           <Radio value="hospital">Hospital</Radio>
           <Radio value="organization">Organization</Radio>
         </Radio.Group>
-        {type !== 'donar' && ( 
+        {type !== 'donor' && ( 
             <>
            
             <Form.Item label="Email" 
@@ -88,7 +98,7 @@ function Login() {
           </>
         )}
 
-{type === 'donar' && ( 
+{type === 'donor' && ( 
             <>
            
             {/* <Form.Item label="Adhaar card number" 

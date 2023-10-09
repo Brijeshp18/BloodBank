@@ -5,13 +5,13 @@ const userSchema = new mongoose.Schema(
     userType: {
       type: String,
       required: true,
-      enum: ["donar", "hospital", "organization", "admin"],
+      enum: ["donor", "hospital", "organization", "admin"],
     },
-    //name field is for admin and donar
+    //name field is for admin and donor
     name: {
       type: String,
       required: function () {
-        if (this.userType == "donar" || this.userType == "admin") {
+        if (this.userType == "donor" || this.userType == "admin") {
           return true;
         }
         return false;
@@ -26,12 +26,12 @@ const userSchema = new mongoose.Schema(
         return false;
       },
     },
-    //adhar card for donar
+    //adhar card for donor
     aadharcardnumber: {
       type: String,
       unique: true,
       required: function () {
-        if (this.userType == "donar") {
+        if (this.userType == "donor") {
           return true;
         }
         return false;
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema(
     bloodgroup: {
       type: String,
       required: function () {
-        if (this.userType == "donar") {
+        if (this.userType == "donor") {
           return true;
         }
         return false;
