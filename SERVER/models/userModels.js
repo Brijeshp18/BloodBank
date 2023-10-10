@@ -26,26 +26,7 @@ const userSchema = new mongoose.Schema(
         return false;
       },
     },
-    //adhar card for donor
-    aadharcardnumber: {
-      type: String,
-      unique: true,
-      required: function () {
-        if (this.userType == "donor") {
-          return true;
-        }
-        return false;
-      },
-    },
-    bloodgroup: {
-      type: String,
-      required: function () {
-        if (this.userType == "donor") {
-          return true;
-        }
-        return false;
-      },
-    },
+   
 
     //hospital Name is for hospital
     hospitalName: {

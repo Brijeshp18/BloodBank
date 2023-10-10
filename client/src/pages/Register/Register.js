@@ -89,38 +89,28 @@ function Register() {
             >
               <Input />
             </Form.Item>
-            <Form.Item label="Blood group" 
-            name="bloodgroup"
-            normalize={(value) => value.trim()}
-             rules={[
-               { required: true, message: "please enter your Blood group" },
-             {min:1},
-             {max:3},
-             {pattern:/^(A|B|AB|O)[\+\-]?$/,message:'invalid blood group'  },
-           
-               
-             ]}
-             hasFeedback
-             >
-              <Input/>
-            </Form.Item>
-            <Form.Item label="Adhaar card number"
-             name="aadharcardnumber"
-             normalize={(value) => value.trim()}
-             rules={[
-               { required: true, message: "please enter your adharcard number" },
-               { min: 12 },
-               {max:12},
-               {pattern:/^\d{12}$/,message: "invalid aadhar number"
-              },
-              
-               
-             ]}
-             hasFeedback
-             >
-             
-              <Input />
-            </Form.Item>
+            <Form.Item label='email' name='email' normalize={(value) => value.trim()}
+            rules={[
+              { required: true, message: "please enter your email Id" },
+              { min: 8 },
+              {type:'email'}
+            ]}
+            hasFeedback
+            >
+        <Input/>
+       </Form.Item>
+       <Form.Item label='password' name='password'
+       normalize={(value) => value.trim()}
+       rules={[
+         { required: true, message: "please enter your password" },
+         { min: 8 },
+         {max:15},
+         
+       ]}
+       hasFeedback
+       >
+        <Input/>
+       </Form.Item>
           </>
         )}
         {type !== "donor" && (
