@@ -4,7 +4,8 @@ const User = require("../models/userModels");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
 const apiController=require("../controllers/apiControl")
-
+const bodyParser = require("body-parser");
+const nodemailer = require("nodemailer"); 
 
 //register a new user
 /**
@@ -291,7 +292,7 @@ router.post("/login",apiController.login
  */
 
 
-router.get("/get-current-user", authMiddleware, async (req, res) => {
+router.get("/current-user", authMiddleware, async (req, res) => {
   try {
     const user = await User.findOne({  
       _id: req.body.userId });
@@ -309,5 +310,12 @@ router.get("/get-current-user", authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = router; // check this line
+
+
+
+
+
+
+
+module.exports = router;
 

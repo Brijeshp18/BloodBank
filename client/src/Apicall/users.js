@@ -11,6 +11,13 @@ export const RegisterUser =async (payload)=>{
 
 
 export const GetCurrentUser = async () => {
-    const response = await axiosInstances("get","/api/users/get-current-user");
+    const response = await axiosInstances("get","/api/users/current-user");
+    return response;
+  };
+
+  
+
+export const Forgotpassword = async (payload) => {
+    const response = await axiosInstances("post","/api/users/forgot-password",payload);
     return response;
   };

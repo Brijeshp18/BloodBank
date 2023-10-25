@@ -1,3 +1,4 @@
+import moment from "moment";
 export const getLoggedInUserName = (user) => {
     if (user.userType === "donor") {
       return user.name;
@@ -18,4 +19,7 @@ export const getLoggedInUserName = (user) => {
     ];
   };
   
+  export const getDateFormat = (date) => {
+    return moment(date).format("DD MMM YYYY hh:mm A");
+  }
   

@@ -4,20 +4,40 @@ import Home from './pages/Home/Home'
 import Login from './pages/Login/Login'
 import Register from './pages/Register/Register'
 import ProtectedPage from './components/ProtectedPage'
-import { SetLoading } from './Redux/loadersSlice'
-import { useSelector } from "react-redux";
+import { useSelector } from 'react-redux';
 import Spinner from './components/Spinner'
+import Resetpassword from './pages/ForgotPassword.js/resetPassword'
+import Profile from './pages/Profile/Profile'
 
 function App() {
-  //const { loading } = useSelector((state) => state.loaders);
+ const { loading } = useSelector((state) => state.loaders);
+ 
+
+
   return (
     <div>
-
-     {/* {loading && <Spinner />} */}
-     <BrowserRouter>
+    {loading && <Spinner />}
+    <BrowserRouter>
       <Routes>
-       <Route path='/' element={ <ProtectedPage> <Home/> </ProtectedPage>}/>
+        <Route
+          path="/"
+          element={
+            <ProtectedPage>
+              <Home />
+            </ProtectedPage>
+          }
+        />
+         <Route
+          path="/profile"
+          element={
+            <ProtectedPage>
+              <Profile />
+            </ProtectedPage>
+          }
+        />
        <Route path='/login' element={<Login/>}/>
+       <Route path='/resetpassword' element={<Resetpassword/>}/>
+      
        {/* <Route path='/' element={<Home/>}/> */}
        <Route path='/register' element={<Register/>}/>
 

@@ -8,16 +8,17 @@
 @tailwind components;
 @tailwind utilities;
 
-input , textarea{
+input , textarea,select {
   min-height: 40px!important;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid #6a6a6a;
   /* border: 1px solid #6a6a6a !important; */
   border-radius: 2px!important;
+  width: 100%;
 }
 input:focus ,  textarea:focus{
   box-shadow: none!important;
-  outline: none!important;
-  border: none!important;
+  /* outline: none!important; */
+  /* border: none!important; */
 }
 .ant-form-item{
   margin-bottom: 0!important;
@@ -37,4 +38,10 @@ a{
 }
 button:hover{
   background-color: #c32c2c!important;
+}
+i{
+  font-size: 20px !important;
+}
+.ant-form-item-label{
+  padding: 0 !important;
 }

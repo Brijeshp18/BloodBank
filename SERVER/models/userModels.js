@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema(
     userType: {
       type: String,
       required: true,
-      enum: ["donor", "hospital", "organization", "admin"],
+      enum: ["donor","hospital","organization","admin"],
     },
     //name field is for admin and donor
     name: {

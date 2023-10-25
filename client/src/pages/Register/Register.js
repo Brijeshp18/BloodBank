@@ -1,20 +1,27 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Button, Form, Input, Radio, message } from "antd";
 import { Link } from "react-router-dom";
 import Hospital from "./Hospital";
 import { RegisterUser } from "../../Apicall/users";
-
+import { SetLoading } from "../../Redux/loadersSlice";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 function Register() {
   const [type, settype] = useState("donor");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [form] = Form.useForm();
   form.setFieldsValue({});
   const onFinish = async(values) => {
     console.log("form datas", values);
     try {
+        dispatch(SetLoading(true));
         const response= await RegisterUser({...values, userType:type})
+        dispatch(SetLoading(false));
         if(response.success){
         message.success(response.message)
+         navigate("/login");
         }
         else {
             throw new Error(response.message)
@@ -23,6 +30,11 @@ function Register() {
         message.error(error.message)
     }
   };
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/");
+    }
+  }, []);
   form.resetFields();
   const onFinishFailed = (errorInfo) => {
     // Handle form validation failures
@@ -106,10 +118,11 @@ function Register() {
          { min: 8 },
          {max:15},
          
+         
        ]}
        hasFeedback
        >
-        <Input/>
+        <Input type="password"/>
        </Form.Item>
           </>
         )}

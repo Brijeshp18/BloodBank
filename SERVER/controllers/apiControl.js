@@ -68,8 +68,8 @@ exports.login= async (req, res) => {
       // Create a JWT token for authentication 1st parameter will be data we want to encrypt 2nd will be  secret key to decrypt the data 3rd will be timeout(how much time will be the validity is)
       
       const payload ={ userId: user._id }; 
-      const secretKey ='Blood-bank' //process.env.jwt_secret    
-      const token = jwt.sign(payload, secretKey, { expiresIn: '1d' });
+      // const secretKey ='Blood-bank' //process.env.jwt_secret    
+      const token = jwt.sign(payload,process.env.secretKey, { expiresIn: '1d' });
       console.log("token is here ", token);
       return res.send({
         success: true,

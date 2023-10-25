@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Button, Form, Input, Radio, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { LoginUser } from "../../Apicall/users";
@@ -8,7 +8,7 @@ import { SetLoading } from "../../Redux/loadersSlice";
 function Login() {
   const [type, settype] = useState("donor");
   const [form] = Form.useForm();
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const onFinish = async (values) => {
@@ -19,9 +19,9 @@ function Login() {
       dispatch(SetLoading(false));
       if (response.success) {
         message.success(response.message);
-        localStorage.setItem("token", response.data);
-        Navigate("/");
-      } else {
+        localStorage.setItem("token",response.data);
+        navigate("/");
+      } else { 
         dispatch(SetLoading(false));
         throw new Error(response.message);
       }
@@ -29,6 +29,11 @@ function Login() {
       message.error(error.message);
     }
   };
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/");
+    }
+  }, []);
 
   const onFinishFailed = (errorInfo) => {
     // Handle form validation failures
@@ -90,9 +95,15 @@ function Login() {
           <Button htmlType="submit" type="primary" block>
             Login
           </Button>
-          <Link to="/register" className=" text-center text-gray-700 underline">
-            Don't have an account <span style={{ color: "red" }}>Register</span>
+
+          <Link to="/resetpassword" className=" text-center text-gray-700 underline">
+           Forgot you'r Password ?<span style={{ color: "orange"}}>  Reset password</span>
           </Link>
+          <Link to="/register" className=" text-center text-gray-700 underline">
+            Don't have an account ? <span style={{ color: "red" }}> Register</span>
+          </Link>
+
+         
         </Form>
       </div>
     </div>

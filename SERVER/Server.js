@@ -7,7 +7,10 @@ const dbConfig = require("./config/dbconfig");
 app.use(express.json());
 app.use(cors()); // connect between different ports
 const userRoutes = require("./routes/usersRoutes");
+const inventoryRoutes = require("./routes/inventoryRoutes")
 app.use("/api/users", userRoutes);
+app.use("/api/inventory", inventoryRoutes);
+
 const swaggerJSDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
