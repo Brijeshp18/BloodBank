@@ -21,6 +21,7 @@ function InventoryForm({ open, setOpen, reloadData }) {
       const response = await AddInventory({...values,inventoryType,organization: currentUser._id})
       dispatch(SetLoading(false))
       if(response.success){
+        reloadData();
         message.success("Inventory added succesfully")
         setOpen(false)
       }

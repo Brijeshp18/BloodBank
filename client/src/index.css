@@ -45,3 +45,6 @@ i{
 .ant-form-item-label{
   padding: 0 !important;
 }
+table{
+  border: 1px solid grey;
+}

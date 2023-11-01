@@ -21,3 +21,19 @@ export const Forgotpassword = async (payload) => {
     const response = await axiosInstances("post","/api/users/forgot-password",payload);
     return response;
   };
+
+  export const GetAllDonarsOfAnOrganization = () => {
+    return axiosInstances("get","/api/users/all-donors");
+  };
+  
+  export const GetAllHospitalsOfAnOrganization = () => {
+    return axiosInstances("get", `/api/users/all-hospitals`);
+  };
+  
+  export const GetAllOrganizationsOfADonar = () => {
+    return axiosInstances("get", `/api/users/all-organizations-of-a-donor`);
+  }
+  
+  export const GetAllOrganizationsOfAHospital = () => {
+    return axiosInstances("get", `/api/users/all-organizations-of-a-hospital`);
+  }

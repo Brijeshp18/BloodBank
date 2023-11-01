@@ -3,9 +3,11 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/userModels");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
-const apiController=require("../controllers/apiControl")
+const apiController = require("../controllers/apiControl");
 const bodyParser = require("body-parser");
-const nodemailer = require("nodemailer"); 
+const nodemailer = require("nodemailer");
+const mongoose = require("mongoose");
+const Inventory = require("../models/inventaryModel");
 
 //register a new user
 /**
@@ -15,7 +17,7 @@ const nodemailer = require("nodemailer");
  *     summary: Register a new user.
  *     tags: [users]
  *     description: Register a new user based on their user type (donor, hospital, or organization).
- *     tag : ["Users"] 
+ *     tag : ["Users"]
  *     requestBody:
  *       required: true
  *       content:
@@ -38,7 +40,7 @@ const nodemailer = require("nodemailer");
  *                 description: The user's password.
  *               phone:
  *                  type: string
- *                
+ *
  *     responses:
  *       200:
  *         description: User registered successfully.
@@ -79,10 +81,10 @@ const nodemailer = require("nodemailer");
  *                 message:
  *                   type: string
  *                   description: A message indicating the registration status.
- *                
+ *
  */
 
-router.post("/register",apiController.register )
+router.post("/register", apiController.register);
 //login functions
 
 /**
@@ -176,11 +178,9 @@ router.post("/register",apiController.register )
  *                   description: A message indicating the login status.
  */
 
+router.post("/login", apiController.login);
 
-router.post("/login",apiController.login 
-);
-
-  // generate token
+// generate token
 //   const token = jwt.sign({ userId: user._id }, process.env.jwt_secret, {
 //     expiresIn: "1d",
 //   });
@@ -195,7 +195,7 @@ router.post("/login",apiController.login
 //     success: false,
 //     message: error.message,
 //   });
- 
+
 // }
 
 // });
@@ -212,12 +212,12 @@ router.post("/login",apiController.login
 //     message:"user fetched succesfully",
 //     data:user,
 //   })
-  
+
 // } catch (error) {
 //  return res.send({
 //   success:false,
 //   message:error.message,
- 
+
 //  })
 // }
 // })
@@ -291,12 +291,12 @@ router.post("/login",apiController.login
  *           description: The email address of the user.
  */
 
-
 router.get("/current-user", authMiddleware, async (req, res) => {
   try {
-    const user = await User.findOne({  
-      _id: req.body.userId });
-    console.log("user is",user)
+    const user = await User.findOne({
+      _id: req.body.userId,
+    });
+    console.log("user is", user);
     return res.send({
       success: true,
       message: "User fetched successfully",
@@ -311,11 +311,104 @@ router.get("/current-user", authMiddleware, async (req, res) => {
 });
 
 
+router.get("/all-donors", authMiddleware, async (req, res) => {
+  try {
+    // get all unique donor ids from inventory
+    const organization = new mongoose.Types.ObjectId(req.body.userId);
+    const uniqueDonorIds = await Inventory.distinct("donor", {
+      organization,
+    });
+
+    const donars = await User.find({
+      _id: { $in: uniqueDonorIds },
+    });
+
+    return res.send({
+      success: true,
+      message: "Donors fetched successfully",
+      data: donars,
+    });
+  } catch (error) {
+    return res.send({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+router.get("/all-hospitals", authMiddleware, async (req, res) => {
+  //get all unique hospital ids from inventory
+  try {
+    const organization = new mongoose.Types.ObjectId(req.body.userId);
+    const uniqueHospitalIds = await Inventory.distinct("hospital", {
+      organization,
+    });
+    const hospital = await User.find({
+      _id: { $in: uniqueHospitalIds },
+    }).populate("owner");
+    return res.send({
+      success: true,
+      message: "Hospital fetched successfully",
+      data: hospital,
+    });
+  } catch (error) {
+    return res.send({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// get all unique organization for a donor
+
+router.get("/all-organizations-of-a-donor", authMiddleware, async (req, res) => {
+  //get all unique hospital ids from inventory
+  try {
+    const donor = new mongoose.Types.ObjectId(req.body.userId);
+    const uniqueOrganizationIds = await Inventory.distinct("organization", {
+      donor,
+    });
+    const hospital = await User.find({
+      _id: { $in: uniqueOrganizationIds },
+    }).populate("owner");
+    return res.send({
+      success: true,
+      message: "Hospital fetched successfully",
+      data: hospital,
+    });
+  } catch (error) {
+    return res.send({
+      success: false,
+      message: error.message,
+    });
+  }
+});
 
 
 
+// get all unique organization for a hospital
 
-
+router.get("/all-organizations-of-a-hospital", authMiddleware, async (req, res) => {
+  //get all unique hospital organization ids from inventory
+  try {
+    const hospital = new mongoose.Types.ObjectId(req.body.userId);
+    const uniqueOrganizationIds = await Inventory.distinct("organization", {
+      hospital,  
+    });
+    const hospitals = await User.find({
+      _id: { $in: uniqueOrganizationIds },
+    }).populate("owner");
+    return res.send({
+      success: true,
+      message: "Hospital fetched successfully",
+      data: hospitals,
+    });
+  } catch (error) {
+    return res.send({
+      success: false,
+      message: error.message,
+    });
+  }
+});
 
 module.exports = router;
-
